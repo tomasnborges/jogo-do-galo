@@ -4,7 +4,7 @@ from random import randint
 para conseguir centrar qualquer string na consola.
 A variável width_console armazena o valor de os.get_terminal_size().columns, propriedade esta que devolve o número total de colunas que dividem a consola. width_console
 é usada como parãmetro de .center(). Este método é chamado dentro da função desenharTabulero() para fazer com que as strings, que desenham o tabuleiro, fiquem centradas na consola."""
-def desenharTabuleiro(tabuleiro,width_consola): # Inspirei-me no código do video https://www.youtube.com/watch?v=RvqmZLuCQrw&t=508s para conseguir desenhar o jogo
+def desenharTabuleiro(tabuleiro,width_consola): # Inspirei-me no código do video https://www.youtube.com/watch?v=RvqmZLuCQrw&t=508s para conseguir desenhar o tabuleiro
     print(str("_"*19).center(width_consola))
     print("|     |     |     |".center(width_consola))
     string_linha = ["|","|","|"]
@@ -61,67 +61,7 @@ def desenharO(tabuleiro,linha,coluna,quem_joga,tente_novamente):
                         return [quem_joga,tente_novamente]
 
 def desenharOPC(tabuleiro,linha,coluna,quem_joga,tente_novamente):
-    #Segundo o site https://blog.ostermiller.org/tic-tac-toe-strategy/ , a melhor estratégia para a primeira 
-    # pessoa que vai jogar é começar por ocupar um dos cantos ou o meio. Se o mesmo escolher um dos cantos, 
-    # a outra pessoa deve ocupar o meio. Com este conhecimento, consigo fazer com que o computador faça isso nas primeiras jogadas.
-    #Portanto, a primeira coisa que devo me focalizar é relativamente à primeira ou a segunda jogada que o robo deve fazer mecanica e automaticamente, tal como num jogo de xadrez
-    #uma vez que as primeiras jogadas são sempre mecânicas.
-
-    #TODO
-
-    #Depois de feitas as primeiras jogadas, as próximas jogadas têm que ser pensadas.
-    #Considero que a máquina devia, em primeiro lugar, verificar se existe algum espaço que tem obrigatoriamente de ser ocupado para não permitir 
-    # que o utilizador ganhe. Por exemplo, o utilizador já ocupou os dois espaços de uma linha e falta-lhe 
-    # ocupar mais um para ganhar. O computador tem que colocar imediatamente um O nesse lugar que falta.
-    #A soma das coordenadas de cada posição : 0 | 1 | 2
-    #                                         1 | 2 | 3
-    #                                         2 | 3 | 4
-    #Para que cada posição seja única, marquei cada uma com ids diferentes, entre 0 a 8:
-    #  0 | 1 | 2
-    #  3 | 4 | 5
-    #  6 | 7 | 8
-    # Sequência das posições que levam à vitória: 0,1,2; 0,3,6; 0,4,8; 1,4,7; 2,5,8; 3,4,5; 6,7,8 e 2,4,6
-    #listar todas as coordenadas do tabuleiro com os seus respetivos ids:
-    posiçoesX = [[0,0,0],[0,1,1],[0,2,2],[1,0,3],[1,1,4],[1,2,5],[2,0,6],[2,1,7],[2,2,8]]
-    sequencias = [[0,1,2],[0,3,6],[0,4,8],[1,4,7],[2,5,8],[3,4,5],[6,7,8],[2,4,6]]
-    id_posiçao = -1 #Posição que a máquina vai preencher 
-    #listar as coordenadas dos X existentes no tabuleiro:
-    posiçoesAtuaisX = []
     for i in range(len(tabuleiro)):
-        for j in range(len(tabuleiro[i])):
-            if tabuleiro[i] == 'X':
-                posiçoesAtuaisX.append([i,j])
-    
-    #Exemplo de uma lista que posiçoesAtuaisX pode armazenar = [[0,0], [0,2], [1,2], [2,2]]
-    for i in range(len(posiçoesAtuaisX)):
-        for j in range(len(posiçoesAtuaisX[i])):
-            if posiçoesAtuaisX[i][j] == posiçoesX[i][j]:
-                if posiçoesAtuaisX[i+1][j+1] == posiçoesX[i+1][j+1]:
-                    posiçoesAtuaisX[i].append(posiçoesX[i+2][j+2])
-                    break
-
-    #Exemplo de uma lista que posiçoesAtuaisX pode armazenar = [[0,0,0], [0,2,2], [1,2,5], [2,2,8]]
-    for i in range(len(sequencias)):      #[0,1,2] 
-        sequencia = sequencias[i]
-        for j in range(len(sequencias[i])): #0 #1 #2
-            for k in range(len(posiçoesAtuaisX)): #0 -> 0  #-  #1 -> 2
-                if posiçoesAtuaisX[k][2] == sequencias[i][j]:
-                    del sequencia[j]
-                    if len(sequencia) == 1:
-                        id_posiçao = sequencia[0]
-                    break
-    
-    #Em segundo lugar, a máquina tem que analisar a última jogada 
-
-    #TODO
-
-
-    for i in range(len(posiçoesX)):
-        for j in range(len(posiçoesX[i])):
-            if tabuleiro[i] == 'X':
-                posiçoesX.append([i,j])
-
-     for i in range(len(tabuleiro)):
         if i == linha:
             for j in range(len(tabuleiro[i])):
                 if j == coluna:
@@ -133,6 +73,107 @@ def desenharOPC(tabuleiro,linha,coluna,quem_joga,tente_novamente):
                         quem_joga = 2
                         tente_novamente = True
                         return [quem_joga,tente_novamente]
+
+def analisarAMelhorJogada(tabuleiro,linha,coluna,nr_da_jogada,quem_joga,tente_novamente):
+    #Segundo o site https://blog.ostermiller.org/tic-tac-toe-strategy/ , a melhor estratégia para a primeira 
+    # pessoa que vai jogar é começar por ocupar um dos cantos ou o meio. Se o mesmo escolher um dos cantos, 
+    # a outra pessoa deve ocupar o meio. Com este conhecimento, consigo fazer com que o computador faça isso nas primeiras jogadas.
+    #Portanto, a primeira coisa em que devo me focalizar é relativamente à primeira ou à segunda jogada que o robo deve fazer mecanica 
+    # e automaticamente, tal como num jogo de xadrez.
+
+    if nr_da_jogada == 0: #Se a máquina é a primeira a jogar
+        #deve escolher aleatóriamente um dos quatro cantos ou o meio para ocupar.
+        escolha_aleatoria = randint(1,5)
+        if escolha_aleatoria == 1: #canto superior esquerdo
+            linha = 0
+            coluna = 0
+        elif escolha_aleatoria == 2: #canto superior direito
+            linha = 0
+            coluna = 2
+        elif escolha_aleatoria == 3: #canto inferior esquerdo
+            linha = 2
+            coluna = 0
+        elif escolha_aleatoria == 4: #canto inferior direito
+            linha = 2
+            coluna = 2
+        else:   #meio
+            linha = 1
+            coluna = 1
+    elif nr_da_jogada == 1: #Se a máquina é a segunda a jogar
+        #deve verificar se o meio está livre.
+        if tabuleiro[1][1] == " ":
+            linha = 1
+            coluna = 1
+        else: #se não estiver livre, então deve ocupar um dos cantos, isto é, se também estiver livre.
+            #Desta vez, o programa vai escolher um número random entre 0 e 3 e o número gerado será o index da variável 'cantos_posiçoes'
+            escolha_aleatoria = randint(0,3)
+            cantos_posiçoes = [[0,0],[0,2],[2,0],[2,0]]
+            canto_preenchido = True
+            while canto_preenchido:
+                linha = cantos_posiçoes[escolha_aleatoria][0] #index da linha
+                coluna = cantos_posiçoes[escolha_aleatoria][1] #index da coluna
+                if tabuleiro[linha][coluna] == ' ':
+                    canto_preenchido = False
+
+    else: #em qualquer restante jogada que não seja a primeira nem a segunda
+
+        #Depois de feitas as duas primeiras jogadas, as próximas jogadas têm que ser pensadas.
+        #Considero que a máquina devia, em primeiro lugar, verificar se existe algum espaço que tem obrigatoriamente de ser ocupado para não permitir 
+        # que o utilizador ganhe. Por exemplo, o utilizador já ocupou os dois espaços de uma fila e falta-lhe 
+        # ocupar mais um para ganhar. O computador tem que colocar imediatamente um O nesse lugar que falta.
+        #A soma das coordenadas de cada posição : 0 | 1 | 2    (0,0 ==> 0+0 = 0 ou 2,2 ==> 2+2=4)
+        #                                         1 | 2 | 3
+        #                                         2 | 3 | 4
+        #Para que cada posição seja única, marquei cada uma com ids diferentes, entre 0 a 8:
+        #  0 | 1 | 2
+        #  3 | 4 | 5
+        #  6 | 7 | 8
+        # Sequência das posições que garantem a vitória: 0,1,2; 0,3,6; 0,4,8; 1,4,7; 2,5,8; 3,4,5; 6,7,8 e 2,4,6
+        #listar todas as coordenadas do tabuleiro com os seus respetivos ids:
+        posiçoesX = [[0,0,0],[0,1,1],[0,2,2],[1,0,3],[1,1,4],[1,2,5],[2,0,6],[2,1,7],[2,2,8]] #O último index de cada sub-lista representa o id de cada posição
+        sequencias = [[0,1,2],[0,3,6],[0,4,8],[1,4,7],[2,5,8],[3,4,5],[6,7,8],[2,4,6]] 
+        posiçoesAtuaisX = [] #lista com todas as coordenadas dos X existentes no tabuleiro
+        #Estrutura de repetição que vai listar todas as coordenadas dentro da lista da variável posiçoesAtuaisX
+        for i in range(len(tabuleiro)):
+            for j in range(len(tabuleiro[i])):
+                if tabuleiro[i] == 'X':
+                    posiçoesAtuaisX.append([i,j])
+        
+        #Exemplo de uma lista que posiçoesAtuaisX pode armazenar = [[0,0], [0,2], [1,2], [2,2]]
+
+        #Estrutura de repetição que vai marcar os ids respetivos de todas as coordenadas dentro da lista da variável posiçoesAtuaisX
+        for i in range(len(posiçoesAtuaisX)):
+            for j in range(len(posiçoesAtuaisX[i])):
+                if posiçoesAtuaisX[i][j] == posiçoesX[i][j]:
+                    if posiçoesAtuaisX[i+1][j+1] == posiçoesX[i+1][j+1]:
+                        posiçoesAtuaisX[i].append(posiçoesX[i+2][j+2])
+                        break
+
+        #A nesma lista atualizada = [[0,0,0], [0,2,2], [1,2,5], [2,2,8]]
+
+        id_posiçao = -1 # id da posição do espaço que a máquina tem que ocupar. -1 não representa nenhum id.
+        for i in range(len(sequencias)):      #[0,1,2] 
+            sequencia = sequencias[i]
+            for j in range(len(sequencias[i])): #0 #1 #2
+                for k in range(len(posiçoesAtuaisX)): #0 -> 0  #-  #1 -> 2
+                    if posiçoesAtuaisX[k][2] == sequencias[i][j]:
+                        del sequencia[j]
+                        if len(sequencia) == 1:
+                            id_posiçao = sequencia[0]
+                        break
+        
+        if id_posiçao == -1: #Significa que a máquina não se encontra em nenhuma situação preocupante, podendo então, 
+        #optar por uma jogada ofensiva.
+            #Em primeiro lugar, verificar se esta jogada garante-lhe a vitória.
+            
+            #Em segundo lugar, a máquina tem que analisar a última jogada 
+
+        #TODO
+
+
+    info = desenharOPC(tabuleiro,linha,coluna,quem_joga,tente_novamente)
+    return info
+    
 
 # Para verificar se o jogo já terminou
 def analisarTabuleiro(tabuleiro): 
@@ -231,7 +272,7 @@ def vsMaquina(jogar_novamente):
     tente_novamente = False
     quem_joga = randint(1,2)
     fim_do_jogo = False
-    for i in range(9):   
+    for nr_da_jogada in range(9):   
         print('\n'*10)  
         if quem_joga == 1:
             desenharTabuleiro(tabuleiro,width_consola)
@@ -252,7 +293,7 @@ def vsMaquina(jogar_novamente):
                 print('\t\t\tÉ a Tua Vez de Jogar!' ,end="\t")
             linha = int(input('\t\t\tLinha: '))
             coluna = int(input('\t\t\tColuna: '))
-            resultados = desenharX(tabuleiro,linha,coluna,quem_joga,tente_novamente)
+            resultados = desenharX(tabuleiro,linha,coluna,quem_joga,tente_novamente,nr_da_jogada)
             quem_joga,tente_novamente = resultados[0], resultados[1]
             fim_do_jogo = analisarTabuleiro(tabuleiro)
         else:
@@ -268,7 +309,7 @@ def vsMaquina(jogar_novamente):
                 else:
                     return 'N'
             
-            resultados = desenharOPC(tabuleiro,linha,coluna,quem_joga,tente_novamente)
+            resultados = analisarAMelhorJogada(tabuleiro,linha,coluna,nr_da_jogada,quem_joga,tente_novamente)
             quem_joga,tente_novamente = resultados[0], resultados[1]
             fim_do_jogo = analisarTabuleiro(tabuleiro)
 
