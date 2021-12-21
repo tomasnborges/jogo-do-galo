@@ -1,5 +1,5 @@
 
-# TIC-TAC-TOE IN PYTHON
+# TIC-TAC-TOE IN PYTHON (PT)
 
 Tic-tac-toe written in python.
 
