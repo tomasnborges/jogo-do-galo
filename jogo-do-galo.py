@@ -19,8 +19,6 @@ def desenharTabuleiro(tabuleiro,width_consola): # Inspirei-me no código do vide
         print("|‾‾‾‾‾|‾‾‾‾‾|‾‾‾‾‾|".center(width_consola))
 
 
-
-
 #Para desenhar o X no tabuleiro
 def desenharX(tabuleiro,linha,coluna,quem_joga,tente_novamente):
     if linha > 3 or coluna > 3 or linha < 0 or coluna < 0: #Se o utilizador escrever coordenadas inválidas
@@ -43,8 +41,6 @@ def desenharX(tabuleiro,linha,coluna,quem_joga,tente_novamente):
                         return [quem_joga,tente_novamente]
 
 
-
-
 #Para desenhar o O no tabuleiro
 def desenharO(tabuleiro,linha,coluna,quem_joga,tente_novamente):
     if linha > 3 or coluna > 3 or linha < 0 or coluna < 0:
@@ -65,8 +61,6 @@ def desenharO(tabuleiro,linha,coluna,quem_joga,tente_novamente):
                         quem_joga = 2
                         tente_novamente = True
                         return [quem_joga,tente_novamente]
-
-
 
 
 def analisarAMelhorJogada(tabuleiro,nr_da_jogada,estrategia,estrategia_posiçoes):
@@ -135,18 +129,19 @@ def analisarAMelhorJogada(tabuleiro,nr_da_jogada,estrategia,estrategia_posiçoes
             id_posiçao = impedirDerrota(id_posiçao, tabuleiro,posiçoes)
             if id_posiçao == -1: #Se a máquina não consegue ganhar ainda nesta jogada
                 #Depois de vários jogos feitos contra o computador do site https://www.hypatiamat.com/jogos/jogoDoGalo/jogoDoGalo_Vhtml.html,
-                # inventei duas estratégias para ganharmos garantidamente um jogo, isto é, se formos os primeiros a jogar e
-                # na segunda jogada o espaço do meio não for ocupado. As estratégias e os comportamentos que a máquina deve ter, dado a segunda 
-                #jogada feita pelo utilizador, estão mais detalhados no ficheiro drawio anexado.
-                #ATUALIZAÇÃO: relembro que não tenciono fazer com que a minha máquina nunca perca. Quero que os utilizadores tenham, às vezes, hipóteses de ganhar. 
+                # descobri duas estratégias para ganharmos garantidamente um jogo, isto é, se formos os primeiros a jogar e
+                # na segunda jogada o espaço do meio não for ocupado. Todas as respostas que a máquina deve dar, dado a primeira
+                #jogada do utilizador, estão mais detalhados no ficheiro drawio anexado.
                 if tabuleiro[1][1] == ' ': #Se o meio ainda não foi ocupado
                     novaPosiçao = usarEstrategia(tabuleiro,nr_da_jogada,estrategia,estrategia_posiçoes,linha,coluna)
-                else: #Se o meio já foi ocupado, a probabilidade de ganhar é muito baixa, por isso o programa vai ocupar apenas espaços aleatorios
+                else: #Se o meio já foi ocupado, a probabilidade de alguêm ganhar é quase nula, por isso o programa vai apenas ocupar espaços aleatorios, se não estiver
+                    #numa situação de perigo
                     novaPosiçao = posicionarAleatoriamente(tabuleiro)
                 linha = novaPosiçao[0]
                 coluna = novaPosiçao[1]
-                try: estrategia = novaPosiçao[2]; estrategia_posiçoes = novaPosiçao[3]
+                try: estrategia_posiçoes = novaPosiçao[2]
                 except: pass
+                else:print(estrategia_posiçoes, 'estrategia_posiçoes go')
         if id_posiçao != -1:
             for i in range(len(posiçoes)):
                 if id_posiçao == posiçoes[i][2]:
@@ -154,9 +149,7 @@ def analisarAMelhorJogada(tabuleiro,nr_da_jogada,estrategia,estrategia_posiçoes
                     coluna = posiçoes[i][1]
     #Desenha o O
     tabuleiro[linha][coluna] = 'O'
-    return [1, False, tabuleiro]        #quem_joga = 1, tente_novamente = False e tabuleiro = [...]
-
-
+    return [1, False, tabuleiro, estrategia_posiçoes]        #quem_joga = 1, tente_novamente = False e tabuleiro = [...]
 
 
 #Função que verifica se precisa de impedir que o utilizador ganhe
@@ -191,8 +184,6 @@ def impedirDerrota(id_posiçao, tabuleiro,posiçoes):
     return id_posiçao
 
 
-
-
 def vencerOJogo(id_posiçao, tabuleiro,posiçoes):
     #listar todas as coordenadas do tabuleiro com os seus respetivos ids:
     sequencias = [[0,1,2],[0,3,6],[0,4,8],[1,4,7],[2,5,8],[3,4,5],[6,7,8],[2,4,6]] 
@@ -224,38 +215,55 @@ def vencerOJogo(id_posiçao, tabuleiro,posiçoes):
     return id_posiçao
 
 
-
-
 #Para o computador saber qual é o espaço que tem que ocupar, com base na primeira jogada do utilizador 
 def usarEstrategia(tabuleiro,nr_da_jogada,estrategia,estrategia_posiçoes,linha,coluna):
-    if nr_da_jogada == 2: #Se for a segunda vez que a máquina joga
+    if nr_da_jogada == 2: #Se a segunda jogada da máquina for a terceira do jogo. Por outras palavras, a máquina jogou (nr_da_jogada=0), depois jogou o tuilizador (nr_da_jogada=1) jogou e agora é a vez da máquina a jogar (nr_da_jogada=3) 
         #Para verificar se a primeira condição é verdadeira (ver documento drawio)
-        numero_random = randint(0,2)
-        if tabuleiro[0][2] == 'O' and (tabuleiro[1][0] == 'X' or tabuleiro[2][1] == 'X'):
-            estrategia_posiçoes = [[0,0],[2,0],[2,2]]
-            linha = estrategia_posiçoes[numero_random][0]
-            coluna = estrategia_posiçoes[numero_random][1]
-            del estrategia_posiçoes[numero_random]
-        elif tabuleiro[2][2] == 'O' and (tabuleiro[1][0] == 'X' or tabuleiro[0][1] == 'X'):      
-            estrategia_posiçoes = [[0,0],[0,2],[2,0]]
-            linha = estrategia_posiçoes[numero_random][0]
-            coluna = estrategia_posiçoes[numero_random][1]
-            del estrategia_posiçoes[numero_random]
-        elif tabuleiro[2][0] == 'O' and (tabuleiro[1][2] == 'X' or tabuleiro[0][1] == 'X'):      
-            estrategia_posiçoes = [[0,0],[0,2],[2,2]]
-            linha = estrategia_posiçoes[numero_random][0]
-            coluna = estrategia_posiçoes[numero_random][1]
-            del estrategia_posiçoes[numero_random]
-        elif tabuleiro[0][0] == 'O' and (tabuleiro[2][1] == 'X' or tabuleiro[1][2] == 'X'):      
-            estrategia_posiçoes = [[2,0],[0,2],[2,2]]
-            linha = estrategia_posiçoes[numero_random][0]
-            coluna = estrategia_posiçoes[numero_random][1]
-            del estrategia_posiçoes[numero_random]
+        if tabuleiro[0][2] == 'O' and tabuleiro[1][0] == 'X':
+            estrategia_posiçoes = [[0,0],[2,2]]
+            linha = estrategia_posiçoes[0][0]
+            coluna = estrategia_posiçoes[0][1]
+            del estrategia_posiçoes[0]
+        elif tabuleiro[0][2] == 'O' and tabuleiro[2][1] == 'X':
+            estrategia_posiçoes = [[2,2],[0,0]]
+            linha = estrategia_posiçoes[0][0]
+            coluna = estrategia_posiçoes[0][1]
+            del estrategia_posiçoes[0] 
+        elif tabuleiro[2][2] == 'O' and tabuleiro[1][0] == 'X':      
+            estrategia_posiçoes = [[2,0],[0,2]]
+            linha = estrategia_posiçoes[0][0]
+            coluna = estrategia_posiçoes[0][1]
+            del estrategia_posiçoes[0] 
+        elif tabuleiro[2][2] == 'O' and tabuleiro[0][1] == 'X':
+            estrategia_posiçoes = [[0,2],[2,0]]
+            linha = estrategia_posiçoes[0][0]
+            coluna = estrategia_posiçoes[0][1]
+            del estrategia_posiçoes[0] 
+        elif tabuleiro[2][0] == 'O' and tabuleiro[1][2] == 'X':      
+            estrategia_posiçoes = [[0,0],[2,2]]
+            linha = estrategia_posiçoes[0][0]
+            coluna = estrategia_posiçoes[0][1]
+            del estrategia_posiçoes[0] 
+        elif tabuleiro[2][0] == 'O' and tabuleiro[0][1] == 'X':
+            estrategia_posiçoes = [[2,2],[0,0]]
+            linha = estrategia_posiçoes[0][0]
+            coluna = estrategia_posiçoes[0][1]
+            del estrategia_posiçoes[0] 
+        elif tabuleiro[0][0] == 'O' and tabuleiro[2][1] == 'X':      
+            estrategia_posiçoes = [[2,0],[0,2]]
+            linha = estrategia_posiçoes[0][0]
+            coluna = estrategia_posiçoes[0][1]
+            del estrategia_posiçoes[0] 
+        elif tabuleiro[0][0] == 'O' and tabuleiro[1][2] == 'X':
+            estrategia_posiçoes = [[0,2],[2,0]]
+            linha = estrategia_posiçoes[0][0]
+            coluna = estrategia_posiçoes[0][1]
+            del estrategia_posiçoes[0] 
         if linha != -1:  # Se a primeira condição for verdadeira
             estrategia = 2
         else: # Se a primeira condição não for verdadeira
             #Para verificar se a segunda condição é verdadeira (ver documento drawio)
-            if estrategia == 1:
+            if estrategia == 1: #Para estratégia 1
                 numero_random = randint(0,1)
                 if tabuleiro[0][2] == 'O' and tabuleiro[2][0] == 'X':
                     estrategia_posiçoes = [[2,2],[0,0]]
@@ -272,7 +280,7 @@ def usarEstrategia(tabuleiro,nr_da_jogada,estrategia,estrategia_posiçoes,linha,
                     linha = estrategia_posiçoes[numero_random][0]
                     coluna = estrategia_posiçoes[numero_random][1]
                     del estrategia_posiçoes[numero_random] 
-                if tabuleiro[2][2] == 'O' and tabuleiro[0][0] == 'X':      
+                elif tabuleiro[2][2] == 'O' and tabuleiro[0][0] == 'X':      
                     estrategia_posiçoes = [[2,0],[0,2]]
                     linha = estrategia_posiçoes[numero_random][0]
                     coluna = estrategia_posiçoes[numero_random][1]
@@ -287,7 +295,7 @@ def usarEstrategia(tabuleiro,nr_da_jogada,estrategia,estrategia_posiçoes,linha,
                     linha = estrategia_posiçoes[numero_random][0]
                     coluna = estrategia_posiçoes[numero_random][1]
                     del estrategia_posiçoes[numero_random] 
-                if tabuleiro[2][0] == 'O' and tabuleiro[0][0] == 'X' :      
+                elif tabuleiro[2][0] == 'O' and tabuleiro[0][0] == 'X' :      
                     estrategia_posiçoes = [[0,2],[2,2]]
                     linha = estrategia_posiçoes[numero_random][0]
                     coluna = estrategia_posiçoes[numero_random][1]
@@ -302,7 +310,7 @@ def usarEstrategia(tabuleiro,nr_da_jogada,estrategia,estrategia_posiçoes,linha,
                     linha = estrategia_posiçoes[numero_random][0]
                     coluna = estrategia_posiçoes[numero_random][1]
                     del estrategia_posiçoes[numero_random] 
-                if tabuleiro[0][0] == 'O' and tabuleiro[2][0] == 'X':      
+                elif tabuleiro[0][0] == 'O' and tabuleiro[2][0] == 'X':      
                     estrategia_posiçoes = [[0,2],[2,2]]
                     linha = estrategia_posiçoes[numero_random][0]
                     coluna = estrategia_posiçoes[numero_random][1]
@@ -317,9 +325,7 @@ def usarEstrategia(tabuleiro,nr_da_jogada,estrategia,estrategia_posiçoes,linha,
                     linha = estrategia_posiçoes[numero_random][0]
                     coluna = estrategia_posiçoes[numero_random][1]
                     del estrategia_posiçoes[numero_random] 
-            if linha != -1:  # Se a segunda condição for verdadeira
-                estrategia = 2
-            else:
+            else: #Para estratégia 2
                 numero_random = randint(0,1)
                 if tabuleiro[0][2] == 'O' and tabuleiro[0][1] == 'X':
                     estrategia_posiçoes = [[2,0],[2,2]]
@@ -331,7 +337,7 @@ def usarEstrategia(tabuleiro,nr_da_jogada,estrategia,estrategia_posiçoes,linha,
                     linha = estrategia_posiçoes[numero_random][0]
                     coluna = estrategia_posiçoes[numero_random][1]
                     del estrategia_posiçoes[numero_random]
-                if tabuleiro[2][2] == 'O' and tabuleiro[2][1] == 'X':      
+                elif tabuleiro[2][2] == 'O' and tabuleiro[2][1] == 'X':      
                     estrategia_posiçoes = [[0,0],[0,2]]
                     linha = estrategia_posiçoes[numero_random][0]
                     coluna = estrategia_posiçoes[numero_random][1]
@@ -341,7 +347,7 @@ def usarEstrategia(tabuleiro,nr_da_jogada,estrategia,estrategia_posiçoes,linha,
                     linha = estrategia_posiçoes[numero_random][0]
                     coluna = estrategia_posiçoes[numero_random][1]
                     del estrategia_posiçoes[numero_random]
-                if tabuleiro[2][0] == 'O' and tabuleiro[2][1] == 'X':      
+                elif tabuleiro[2][0] == 'O' and tabuleiro[2][1] == 'X':      
                     estrategia_posiçoes = [[0,2],[0,0]]
                     linha = estrategia_posiçoes[numero_random][0]
                     coluna = estrategia_posiçoes[numero_random][1]
@@ -351,7 +357,7 @@ def usarEstrategia(tabuleiro,nr_da_jogada,estrategia,estrategia_posiçoes,linha,
                     linha = estrategia_posiçoes[numero_random][0]
                     coluna = estrategia_posiçoes[numero_random][1]
                     del estrategia_posiçoes[numero_random]
-                if tabuleiro[0][0] == 'O' and tabuleiro[0][1] == 'X':      
+                elif tabuleiro[0][0] == 'O' and tabuleiro[0][1] == 'X':      
                     estrategia_posiçoes = [[2,0],[2,2]]
                     linha = estrategia_posiçoes[numero_random][0]
                     coluna = estrategia_posiçoes[numero_random][1]
@@ -363,32 +369,32 @@ def usarEstrategia(tabuleiro,nr_da_jogada,estrategia,estrategia_posiçoes,linha,
                     del estrategia_posiçoes[numero_random]
                 if linha == -1: # Se a segunda condição não for verdadeira
                     #Para verificar se a terceira condição é verdadeira (ver documento drawio)
-                    if estrategia == 1:
+                    if estrategia == 1: #Para a estratégia 1
                         if tabuleiro[0][2] == 'O' and tabuleiro[0][1] == 'X':
                             linha = 1
                             coluna = 2
                         elif tabuleiro[0][2] == 'O' and tabuleiro[1][2] == 'X':
                             linha = 0
                             coluna = 1
-                        if tabuleiro[2][2] == 'O' and tabuleiro[2][1] == 'X':      
+                        elif tabuleiro[2][2] == 'O' and tabuleiro[2][1] == 'X':      
                             linha = 1
                             coluna = 2
                         elif tabuleiro[2][2] == 'O' and tabuleiro[1][2] == 'X' :      
                             linha = 2
                             coluna = 1
-                        if tabuleiro[2][0] == 'O' and tabuleiro[2][1] == 'X':      
+                        elif tabuleiro[2][0] == 'O' and tabuleiro[2][1] == 'X':      
                             linha = 1
                             coluna = 0
                         elif tabuleiro[2][0] == 'O' and tabuleiro[1][0] == 'X':      
                             linha = 2
                             coluna = 1
-                        if tabuleiro[0][0] == 'O' and tabuleiro[0][1] == 'X':      
+                        elif tabuleiro[0][0] == 'O' and tabuleiro[0][1] == 'X':      
                             linha = 1
                             coluna = 0
                         elif tabuleiro[0][0] == 'O' and tabuleiro[1][0] == 'X':      
                             linha = 0
                             coluna = 1
-                    else:
+                    else: #Para estratégia 2
                         numero_random = randint(0,1)
                         if tabuleiro[0][2] == 'O' and tabuleiro[0][0] == 'X':
                             estrategia_posiçoes = [[2,0],[2,2]]
@@ -405,7 +411,7 @@ def usarEstrategia(tabuleiro,nr_da_jogada,estrategia,estrategia_posiçoes,linha,
                             linha = estrategia_posiçoes[numero_random][0]
                             coluna = estrategia_posiçoes[numero_random][1]
                             del estrategia_posiçoes[numero_random]
-                        if tabuleiro[2][2] == 'O' and tabuleiro[2][0] == 'X':      
+                        elif tabuleiro[2][2] == 'O' and tabuleiro[2][0] == 'X':      
                             estrategia_posiçoes = [[0,0],[0,2]]
                             linha = estrategia_posiçoes[numero_random][0]
                             coluna = estrategia_posiçoes[numero_random][1]
@@ -420,7 +426,7 @@ def usarEstrategia(tabuleiro,nr_da_jogada,estrategia,estrategia_posiçoes,linha,
                             linha = estrategia_posiçoes[numero_random][0]
                             coluna = estrategia_posiçoes[numero_random][1]
                             del estrategia_posiçoes[numero_random]
-                        if tabuleiro[2][0] == 'O' and tabuleiro[2][2] == 'X':      
+                        elif tabuleiro[2][0] == 'O' and tabuleiro[2][2] == 'X':      
                             estrategia_posiçoes = [[0,2],[0,0]]
                             linha = estrategia_posiçoes[numero_random][0]
                             coluna = estrategia_posiçoes[numero_random][1]
@@ -435,7 +441,7 @@ def usarEstrategia(tabuleiro,nr_da_jogada,estrategia,estrategia_posiçoes,linha,
                             linha = estrategia_posiçoes[numero_random][0]
                             coluna = estrategia_posiçoes[numero_random][1]
                             del estrategia_posiçoes[numero_random]
-                        if tabuleiro[0][0] == 'O' and tabuleiro[0][2] == 'X':      
+                        elif tabuleiro[0][0] == 'O' and tabuleiro[0][2] == 'X':      
                             estrategia_posiçoes = [[2,0],[2,2]]
                             linha = estrategia_posiçoes[numero_random][0]
                             coluna = estrategia_posiçoes[numero_random][1]
@@ -458,11 +464,10 @@ def usarEstrategia(tabuleiro,nr_da_jogada,estrategia,estrategia_posiçoes,linha,
             linha = estrategia_posiçoes[0][0]
             coluna = estrategia_posiçoes[0][1]
         estrategia_posiçoes = []
-    return [linha,coluna,estrategia,estrategia_posiçoes]
+    return [linha,coluna,estrategia_posiçoes]
 
 
-
-
+#Função que vai ocupar um espaço aleatoriamente, uma vez que o espaço do meio já foi ocupado e não há hipóteses de ganhar.
 def posicionarAleatoriamente(tabuleiro):
     numero_random = randint(0,2)
     repetir= True
@@ -473,8 +478,6 @@ def posicionarAleatoriamente(tabuleiro):
                 tabuleiro[numero_random][numero_random1] == 'O'
                 return [numero_random, numero_random1]
             
-
-
 
 # Para verificar se o jogo já terminou
 def analisarTabuleiro(tabuleiro): 
@@ -507,8 +510,6 @@ def analisarTabuleiro(tabuleiro):
     return False
     
 
-
-
 #Contra um amigo
 def vsAmigo(player1,player2,jogar_novamente):
     linha,coluna = 0,0
@@ -521,7 +522,7 @@ def vsAmigo(player1,player2,jogar_novamente):
     for i in range(10):    #É de 0 a 10, porque se formos os primeiros a jogar, a primeira iteração não conta. A primeira iteração serve para mostrar apenas o tabuleiro vazio
         print('\n'*10)     # substitui os.system('cls') por este print, uma vez que se eu fizesse scroll para cima na consola, 
         #algumas partes dos tabuleiros antigos apareciam e sujavam a consola. Este problema de os.system('cls') não conseguir
-        #  apagar totalmente a consola deve-se secalhar ao facto de ser chamada muitas vezes
+        #apagar totalmente a consola deve-se secalhar ao facto de ser chamada muitas vezes
         if quem_joga == 1:
             desenharTabuleiro(tabuleiro,width_consola)
             if fim_do_jogo:
@@ -584,18 +585,17 @@ def vsAmigo(player1,player2,jogar_novamente):
             fim_do_jogo = analisarTabuleiro(tabuleiro)
 
 
-
-
 #Contra o computador
 def vsMaquina(jogar_novamente,estrategia,quem_joga):
     resultados = []
-    width_consola = os.get_terminal_size().columns  
+    width_consola = os.get_terminal_size().columns  #Ler o primeiro comentário para perceber esta variável
     tabuleiro = [[' ',' ',' '],[' ',' ',' '],[' ',' ',' ']]
     tente_novamente = False
     fim_do_jogo = False
     estrategia_posiçoes = []
     for nr_da_jogada in range(10): #É de 0 a 10, porque se formos os primeiros a jogar, a primeira iteração não conta. A primeira iteração serve para mostrar apenas o tabuleiro vazio
         print('\n'*10)  
+        print(nr_da_jogada, "nr_da_jogada")
         if quem_joga == 1: #Se é a vez do utilizador a jogar
             desenharTabuleiro(tabuleiro,width_consola)
             if fim_do_jogo:
@@ -639,14 +639,8 @@ def vsMaquina(jogar_novamente,estrategia,quem_joga):
                 else:
                     return 'N'
             resultados = analisarAMelhorJogada(tabuleiro,nr_da_jogada,estrategia,estrategia_posiçoes)
-            quem_joga,tente_novamente,tabuleiro = resultados[0], resultados[1], resultados[2]
-            try:
-                estrategia_posiçoes = resultados[3]
-            except:
-                pass
+            quem_joga,tente_novamente,tabuleiro,estrategia_posiçoes = resultados[0], resultados[1], resultados[2], resultados[3]
             fim_do_jogo = analisarTabuleiro(tabuleiro)
-
-
 
 
 def menuJogarPrimeiro():
