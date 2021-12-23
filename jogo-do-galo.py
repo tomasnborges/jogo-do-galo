@@ -356,31 +356,24 @@ def terceiraCondiçao(tabuleiro,linha,coluna,estrategia,estrategia_posiçoes):
     if estrategia == 1: #Para a estratégia 1
         estrategia_posiçoes = []
         if tabuleiro[0][2] == 'O' and tabuleiro[0][1] == 'X':
-            
             linha = 1
             coluna = 2
         elif tabuleiro[0][2] == 'O' and tabuleiro[1][2] == 'X':
-            
             linha = 0
             coluna = 1
         elif tabuleiro[2][2] == 'O' and tabuleiro[2][1] == 'X':   
-               
             linha = 1
             coluna = 2
         elif tabuleiro[2][2] == 'O' and tabuleiro[1][2] == 'X' :     
-             
             linha = 2
             coluna = 1
         elif tabuleiro[2][0] == 'O' and tabuleiro[2][1] == 'X':    
-              
             linha = 1
             coluna = 0
         elif tabuleiro[2][0] == 'O' and tabuleiro[1][0] == 'X':  
-                
             linha = 2
             coluna = 1
         elif tabuleiro[0][0] == 'O' and tabuleiro[0][1] == 'X':   
-               
             linha = 1
             coluna = 0
         elif tabuleiro[0][0] == 'O' and tabuleiro[1][0] == 'X':   
