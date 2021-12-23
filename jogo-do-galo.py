@@ -492,7 +492,7 @@ def posicionarAleatoriamente(tabuleiro):
             if tabuleiro[numero_random][numero_random1] == ' ':
                 tabuleiro[numero_random][numero_random1] == 'O'
                 return [numero_random, numero_random1]
-            
+
 
 #Função que verifica se o jogo já pode terminar
 def analisarTabuleiro(tabuleiro): 
@@ -525,11 +525,37 @@ def analisarTabuleiro(tabuleiro):
     return False
     
 
+#Função que avalia se o utilizador inseriu valores válidos para a coluna ou para a linha
+def selecionarLinhaColuna():
+    linha_valida = True
+    coluna_valida = True
+    while linha_valida:
+        try: linha = int(input('\t\t\tLinha: '))
+        except: print('\t\t\tNúmero válido por favor')
+        else: linha_valida = False
+    while coluna_valida:
+        try: coluna = int(input('\t\t\tColuna: '))
+        except: print('\t\t\tNúmero válido por favor')
+        else: coluna_valida = False
+    return [linha,coluna]
+
+
+#A função que é chamada quando o jogo acaba
+def terminarOJogo(fim_do_jogo, texto):
+    if fim_do_jogo == 3: #Se o jogo ficou empatado
+        print('\t\t\tEmpate!' ,end="")
+    else: print('\t\t\t{0}' .format(texto) , end="") #Se houve vitoria/derrota
+    jogar_novamente = input('\t Jogar novamente? (S/N): ')
+    if jogar_novamente.upper() == 'S':
+        os.system('cls')
+        return 'S'
+    else:
+        return 'N'
+            
+
 #Função que inicializa um jogo contra um amigo
 def vsAmigo(player1,player2,jogar_novamente):
-    linha,coluna = 0,0
     resultados = []
-    width_consola = os.get_terminal_size().columns  
     tabuleiro = [[' ',' ',' '],[' ',' ',' '],[' ',' ',' ']]
     tente_novamente = False
     quem_joga = randint(1,2)
@@ -541,57 +567,28 @@ def vsAmigo(player1,player2,jogar_novamente):
         #algumas partes dos tabuleiros antigos apareciam e sujavam a consola. Este problema de os.system('cls') não conseguir
         #apagar totalmente a consola deve-se secalhar ao facto de ser chamada muitas vezes
         desenharTabuleiro(tabuleiro,width_consola) #Desenha o tabuleiro
-        linha_valida = True
-        coluna_valida = True
         if quem_joga == 1: #Vez do player1
             if fim_do_jogo:
-                if fim_do_jogo == 3:
-                    print('\t\t\tEmpate!' ,end="")
-                else: print('\t\t\tParabéns {0} Foste o Vencedor!' .format(player2) , end="")
-                jogar_novamente = input('\t Jogar novamente? (S/N): ')
-                if jogar_novamente.upper() == 'S':
-                    os.system('cls')
-                    return 'S'
-                else:
-                    return 'N'
+                texto = 'Parabéns '+player2+' Foste O Vencedor!'
+                return terminarOJogo(fim_do_jogo, texto)
             if tente_novamente:
                 print('\t\t\tCoordenadas Inválidas! {0} Tente Novamente!' .format(player1),end="")
                 tente_novamente = False
             else:
                 print('\t\t\tÉ a Vez de {0} Jogar!' .format(player1),end="\t")
-            #Para escolher a linha e a coluna
-            while linha_valida:
-                try: linha = int(input('\t\t\tLinha: '))
-                except: print('\t\t\tNúmero válido por favor')
-                else: linha_valida = False
-            while coluna_valida:
-                try: coluna = int(input('\t\t\tColuna: '))
-                except: print('\t\t\tNúmero válido por favor')
-                else: coluna_valida = False
+            linha_coluna = selecionarLinhaColuna()
+            linha, coluna = linha_coluna[0],linha_coluna[1]
         else: # Vez do player2
             if fim_do_jogo:
-                if fim_do_jogo == 3:
-                    print('\t\t\tEmpate!' ,end="")
-                else: print('\t\t\tParabéns {0} Foste o Vencedor!' .format(player1) , end="")
-                jogar_novamente = input('\t Jogar novamente? (S/N): ')
-                if jogar_novamente.upper() == 'S':
-                    os.system('cls')
-                    return 'S'
-                else:
-                    return 'N'
+                texto = 'Parabéns '+player1+' Foste O Vencedor!'
+                return terminarOJogo(fim_do_jogo, texto)
             if tente_novamente:
                 print('\t\t\tCoordenadas Inválidas! {0} Tente Novamente!' .format(player2),end="")
                 tente_novamente = False
             else:
                 print('\t\t\tÉ a Vez de {0} jogar!' .format(player2),end="\t")
-            while linha_valida:
-                try: linha = int(input('\t\t\tLinha: '))
-                except: print('\t\t\tNúmero válido por favor')
-                else: linha_valida = False
-            while coluna_valida:
-                try: coluna = int(input('\t\t\tColuna: '))
-                except: print('\t\t\tNúmero válido por favor')
-                else: coluna_valida = False
+            linha_coluna = selecionarLinhaColuna()
+            linha, coluna = linha_coluna[0],linha_coluna[1]
         resultados = desenharXouO(tabuleiro,linha,coluna,quem_joga,tente_novamente,nr_da_jogada)
         quem_joga,tente_novamente = resultados[0], resultados[1]
         fim_do_jogo = analisarTabuleiro(tabuleiro)
@@ -601,7 +598,6 @@ def vsAmigo(player1,player2,jogar_novamente):
 #Função que inicializa um jogo contra o computador
 def vsMaquina(jogar_novamente,estrategia,quem_joga):
     resultados = []
-    width_consola = os.get_terminal_size().columns  #Ler o primeiro comentário para perceber esta variável
     tabuleiro = [[' ',' ',' '],[' ',' ',' '],[' ',' ',' ']]
     tente_novamente = False
     fim_do_jogo = False
@@ -610,45 +606,23 @@ def vsMaquina(jogar_novamente,estrategia,quem_joga):
     while not fim_do_jogo or fim_do_jogo == 3 or fim_do_jogo == 2:   # fim_do_jogo = False -> o jogo continua; 2 => O jogo informará quem foi o vencedor; 3 =>  O jogo informará que foi um empate
         print('\n'*10)  
         desenharTabuleiro(tabuleiro,width_consola)
-        linha_valida = True
-        coluna_valida = True
         if quem_joga == 1: #Se é a vez do utilizador a jogar
             if fim_do_jogo:
-                if fim_do_jogo == 3:
-                    print('\t\t\tEmpate!' ,end="")
-                else: print('\t\t\tA Máquina Foi a Vencedora!', end="")
-                jogar_novamente = input('\t Jogar novamente? (S/N): ')
-                if jogar_novamente.upper() == 'S':
-                    os.system('cls')
-                    return 'S'
-                else:
-                    return 'N'
+                texto = 'O Computador Foi O Vencedor :C'
+                return terminarOJogo(fim_do_jogo, texto)
             if tente_novamente:
                 print('\t\t\tCoordenadas Inválidas! Tente Novamente!',end="")
                 tente_novamente = False
             else:
                 print('\t\t\tÉ a Tua Vez de Jogar!' ,end="\t")
-            while linha_valida:
-                try: linha = int(input('\t\t\tLinha: '))
-                except: print('\t\t\tNúmero válido por favor')
-                else: linha_valida = False
-            while coluna_valida:
-                try: coluna = int(input('\t\t\tColuna: '))
-                except: print('\t\t\tNúmero válido por favor')
-                else: coluna_valida = False
+            linha_coluna = selecionarLinhaColuna()
+            linha, coluna = linha_coluna[0],linha_coluna[1]
             resultados = desenharXouO(tabuleiro,linha,coluna,quem_joga,tente_novamente,nr_da_jogada)
             quem_joga,tente_novamente,nr_da_jogada = resultados[0], resultados[1], resultados[2]
         else:   #Se é vez da máquina a jogar
             if fim_do_jogo:
-                if fim_do_jogo == 3:
-                    print('\t\t\tEmpate!' ,end="")
-                else: print('\t\t\tParabéns Foste o Vencedor!' , end="")
-                jogar_novamente = input('\t Jogar novamente? (S/N): ')
-                if jogar_novamente.upper() == 'S':
-                    os.system('cls')
-                    return 'S'
-                else:
-                    return 'N'
+                texto = 'Parabéns Foste o Vencedor!'
+                return terminarOJogo(fim_do_jogo, texto)
             resultados = analisarAMelhorJogada(tabuleiro,nr_da_jogada,estrategia,estrategia_posiçoes)
             quem_joga,tente_novamente,tabuleiro,estrategia_posiçoes = resultados[0], resultados[1], resultados[2], resultados[3]
         fim_do_jogo = analisarTabuleiro(tabuleiro)
@@ -677,6 +651,7 @@ def menuJogarPrimeiro():
 
 #----------------------------------------------------------------------\\---------------------------------------------------
 #Menu principal do jogo
+width_consola = os.get_terminal_size().columns  #Ler o primeiro comentário para perceber esta variável
 jogar_novamente = "S"
 while jogar_novamente.upper() == 'S':
     opçao = input('\n\n\n\t\t\tMENU\n\t\t\t1-Jogar com um amigo\n\t\t\t2-Jogar contra o computador\n\t\t\t0-Sair\n\t\t\tEscolha uma opção: ')
