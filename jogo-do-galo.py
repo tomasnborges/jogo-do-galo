@@ -36,7 +36,6 @@ def desenharXouO(tabuleiro,linha,coluna,quem_joga,tente_novamente,nr_da_jogada):
                     if tabuleiro[i][j] == ' ': #Se o elemento estiver vazio
                         if quem_joga == 1: quem_joga = 2; simbolo = 'X'    #Se o player1/utilizador acabou de jogar, então o simbolo 'X' vai ser desenhado na posição que o mesmo escolheu e o próximo a jogar será o player2/computador
                         else: quem_joga = 1; simbolo = 'O'                 #vice-versa
-                        print(quem_joga)
                         tabuleiro[i][j] = simbolo
                         return [quem_joga, False, nr_da_jogada]
                     else: #Senão vai alertar que o utilizador escreveu coordenadas inválidas, o nr_da_jogada é decrementado.
@@ -198,13 +197,13 @@ def vencerOJogo(id_posiçao,tabuleiro,posiçoes):
     return id_posiçao
 
 
-#Função que verifica se a primeira condição é verdadeira (para entender melhor esta função, ler documento orientador)
-def primeiraCondiçao(tabuleiro,linha,coluna,estrategia_posiçoes):
-    if tabuleiro[0][2] == 'O' and tabuleiro[1][0] == 'X':
-        estrategia_posiçoes = [[0,0],[2,2]]
-        linha = estrategia_posiçoes[0][0]
-        coluna = estrategia_posiçoes[0][1]
-        del estrategia_posiçoes[0]
+#Função que verifica se a primeira condição é verdadeira (Ver imagem "estrategias-adotadas")
+def verificarPrimeiraCondiçao(tabuleiro,linha,coluna,estrategia_posiçoes):
+    if tabuleiro[0][2] == 'O' and tabuleiro[1][0] == 'X':   #Se na primeira ronda, o computador ocupou o espaço [0,2] (linha 0 e coluna 2) e o utilizador respondeu, ocupando o espaço [1,0]
+        estrategia_posiçoes = [[0,0],[2,2]] #Entao o utilizador armazena os espaços que vai ocupar nas proximas duas rondas
+        linha = estrategia_posiçoes[0][0]   #O computador selecionou a linha com index =  0
+        coluna = estrategia_posiçoes[0][1]  #O computador selecionou a coluna com index =  0
+        del estrategia_posiçoes[0]  #Apaga a posição [0,0] porque vai ocupá-la nesta jogada
     elif tabuleiro[0][2] == 'O' and tabuleiro[2][1] == 'X':
         estrategia_posiçoes = [[2,2],[0,0]]
         linha = estrategia_posiçoes[0][0]
@@ -243,8 +242,8 @@ def primeiraCondiçao(tabuleiro,linha,coluna,estrategia_posiçoes):
     return[linha,coluna,estrategia_posiçoes]
 
 
-#Para verificar se a segunda condição é verdadeira (para entender melhor esta função, ler documento orientador)
-def segundaCondiçao(tabuleiro,linha,coluna,estrategia,estrategia_posiçoes):
+#Para verificar se a segunda condição é verdadeira (Ver imagem "estrategias-adotadas")
+def verificarSegundaCondiçao(tabuleiro,linha,coluna,estrategia,estrategia_posiçoes):
     if estrategia == 1: #Para estratégia 1
         numero_random = randint(0,1)
         if tabuleiro[0][2] == 'O' and tabuleiro[2][0] == 'X':
@@ -351,8 +350,8 @@ def segundaCondiçao(tabuleiro,linha,coluna,estrategia,estrategia_posiçoes):
     return[linha,coluna,estrategia_posiçoes]
     
 
-#Função que verifica se a terceira condição é verdadeira (para entender melhor esta função, ler documento orientador)
-def terceiraCondiçao(tabuleiro,linha,coluna,estrategia,estrategia_posiçoes):
+#Função que verifica se a terceira condição é verdadeira (Ver imagem "estrategias-adotadas")
+def verificarTerceiraCondiçao(tabuleiro,linha,coluna,estrategia,estrategia_posiçoes):
     if estrategia == 1: #Para a estratégia 1
         estrategia_posiçoes = []
         if tabuleiro[0][2] == 'O' and tabuleiro[0][1] == 'X':
@@ -447,20 +446,20 @@ def terceiraCondiçao(tabuleiro,linha,coluna,estrategia,estrategia_posiçoes):
 #Função que permite o computador saber qual é o espaço que tem de ocupar, com base na primeira jogada do utilizador.
 def usarEstrategia(tabuleiro,nr_da_jogada,estrategia,estrategia_posiçoes,linha,coluna):
     if nr_da_jogada == 2: #Se a segunda jogada da máquina for a terceira do jogo. Por outras palavras, se a máquina jogou (nr_da_jogada=0), depois jogou o tuilizador (nr_da_jogada=1) jogou e agora é a vez da máquina a jogar (nr_da_jogada=2) 
-        resultados_condiçao = primeiraCondiçao(tabuleiro,linha,coluna,estrategia_posiçoes)
+        resultados_condiçao = verificarPrimeiraCondiçao(tabuleiro,linha,coluna,estrategia_posiçoes)
         linha = resultados_condiçao[0]
         coluna = resultados_condiçao[1]
         estrategia_posiçoes = resultados_condiçao[2]
         if linha != -1:  # Se a primeira condição for verdadeira
             estrategia = 2
         else: # Se a primeira condição não for verdadeira
-            resultados_condiçao = segundaCondiçao(tabuleiro,linha,coluna,estrategia,estrategia_posiçoes)
+            resultados_condiçao = verificarSegundaCondiçao(tabuleiro,linha,coluna,estrategia,estrategia_posiçoes)
             linha = resultados_condiçao[0]
             coluna = resultados_condiçao[1]
             estrategia_posiçoes = resultados_condiçao[2]
         if linha == -1: # Se a segunda condição não for verdadeira
-            #Para verificar se a terceira condição é verdadeira (para entender melhor esta função, ler documento orientador)
-            resultados_condiçao = terceiraCondiçao(tabuleiro,linha,coluna,estrategia,estrategia_posiçoes)
+            #Para verificar se a terceira condição é verdadeira
+            resultados_condiçao = verificarTerceiraCondiçao(tabuleiro,linha,coluna,estrategia,estrategia_posiçoes)
             linha = resultados_condiçao[0]
             coluna = resultados_condiçao[1]
             estrategia_posiçoes = resultados_condiçao[2]
@@ -477,14 +476,12 @@ def usarEstrategia(tabuleiro,nr_da_jogada,estrategia,estrategia_posiçoes,linha,
 
 #Função que vai ocupar um espaço aleatoriamente, uma vez que o espaço do meio já foi ocupado e não há hipóteses de ganhar.
 def posicionarAleatoriamente(tabuleiro):
-    numero_random = randint(0,2)
-    repetir= True
-    while repetir:
+    for numero_random in range(3):
         if tabuleiro[numero_random].count(' ') > 0:
-            numero_random1 = randint(0,2)
-            if tabuleiro[numero_random][numero_random1] == ' ':
-                tabuleiro[numero_random][numero_random1] == 'O'
-                return [numero_random, numero_random1]
+            for i in range(3):
+                if tabuleiro[numero_random][i] == ' ':
+                    tabuleiro[numero_random][i] == 'O'
+                    return [numero_random, i]
 
 
 #Função que verifica se o jogo já pode terminar
@@ -547,7 +544,7 @@ def terminarOJogo(fim_do_jogo, texto):
             
 
 #Função que inicializa um jogo contra um amigo
-def vsAmigo(player1,player2,jogar_novamente):
+def jogarContraAmigo(player1,player2,jogar_novamente):
     resultados = []
     tabuleiro = [[' ',' ',' '],[' ',' ',' '],[' ',' ',' ']]
     tente_novamente = False
@@ -589,7 +586,7 @@ def vsAmigo(player1,player2,jogar_novamente):
 
 
 #Função que inicializa um jogo contra o computador
-def vsMaquina(jogar_novamente,estrategia,quem_joga):
+def jogarContraComputador(estrategia,quem_joga):
     resultados = []
     tabuleiro = [[' ',' ',' '],[' ',' ',' '],[' ',' ',' ']]
     tente_novamente = False
@@ -597,7 +594,7 @@ def vsMaquina(jogar_novamente,estrategia,quem_joga):
     nr_da_jogada = 0
     estrategia_posiçoes = []
     while not fim_do_jogo or fim_do_jogo == 3 or fim_do_jogo == 2:   # fim_do_jogo = False -> o jogo continua; 2 => O jogo informará quem foi o vencedor; 3 =>  O jogo informará que foi um empate
-        print('\n'*10)  
+        print('\n'*10)
         desenharTabuleiro(tabuleiro,width_consola)
         if quem_joga == 1: #Se é a vez do utilizador a jogar
             if fim_do_jogo:
@@ -660,7 +657,7 @@ while jogar_novamente.upper() == 'S':
                 nomes_iguais = False
             else:
                 print('\n\n\n\t\t\tPlayer 2 Não Pode Ter o Mesmo Nome Que o Player 1, Insira Outro Nome Por Favor.')
-        jogar_novamente = vsAmigo(player1,player2,jogar_novamente)
+        jogar_novamente = jogarContraAmigo(player1,player2,jogar_novamente)
     elif opçao == '2':
         print('\n'*10)
         escolha = menuJogarPrimeiro()
@@ -668,7 +665,7 @@ while jogar_novamente.upper() == 'S':
         quem_joga = escolha[1]
         opçao1 = escolha[2]
         if opçao1 != '0':
-            jogar_novamente = vsMaquina(jogar_novamente,estrategia,quem_joga) 
+            jogar_novamente = jogarContraComputador(estrategia,quem_joga) 
         
     elif opçao == '0':
         jogar_novamente = 'N'
