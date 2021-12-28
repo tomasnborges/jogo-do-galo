@@ -70,7 +70,7 @@ def analisarAMelhorJogada(tabuleiro,nr_da_jogada,estrategia,estrategia_posiçoes
         elif escolha_aleatoria == 4: #canto inferior direito
             linha = 2
             coluna = 2
-        else:   #meio. ATUALIZAÇÃO: não tenciono fazer com que a minha máquina nunca perca. Quero que os utilizadores tenham, às vezes, hipóteses de ganhar. 
+        else:   #meio. Não tenciono fazer com que a minha máquina nunca empate nem perca quando é a primeira a jogar.
             linha = 1
             coluna = 1
     elif nr_da_jogada == 1: #Se a máquina é a segunda a jogar
@@ -200,7 +200,7 @@ def vencerOJogo(id_posiçao,tabuleiro,posiçoes):
 #Função que verifica se a primeira condição é verdadeira (Ver imagem "estrategias-adotadas")
 def verificarPrimeiraCondiçao(tabuleiro,linha,coluna,estrategia_posiçoes):
     if tabuleiro[0][2] == 'O' and tabuleiro[1][0] == 'X':   #Se na primeira ronda, o computador ocupou o espaço [0,2] (linha 0 e coluna 2) e o utilizador respondeu, ocupando o espaço [1,0]
-        estrategia_posiçoes = [[0,0],[2,2]] #Entao o utilizador armazena os espaços que vai ocupar nas proximas duas rondas
+        estrategia_posiçoes = [[0,0],[2,2]] #Entao o computador armazena os espaços que vai ocupar nas proximas duas rondas
         linha = estrategia_posiçoes[0][0]   #O computador selecionou a linha com index =  0
         coluna = estrategia_posiçoes[0][1]  #O computador selecionou a coluna com index =  0
         del estrategia_posiçoes[0]  #Apaga a posição [0,0] porque vai ocupá-la nesta jogada
@@ -445,7 +445,7 @@ def verificarTerceiraCondiçao(tabuleiro,linha,coluna,estrategia,estrategia_posi
 
 #Função que permite o computador saber qual é o espaço que tem de ocupar, com base na primeira jogada do utilizador.
 def usarEstrategia(tabuleiro,nr_da_jogada,estrategia,estrategia_posiçoes,linha,coluna):
-    if nr_da_jogada == 2: #Se a segunda jogada da máquina for a terceira do jogo. Por outras palavras, se a máquina jogou (nr_da_jogada=0), depois jogou o tuilizador (nr_da_jogada=1) jogou e agora é a vez da máquina a jogar (nr_da_jogada=2) 
+    if nr_da_jogada == 2: #Se a segunda jogada da máquina for a terceira do jogo. Por outras palavras, se a máquina jogou (nr_da_jogada=0), depois o uilizador (nr_da_jogada=1) jogou e agora é a vez da máquina a jogar (nr_da_jogada=2) 
         resultados_condiçao = verificarPrimeiraCondiçao(tabuleiro,linha,coluna,estrategia_posiçoes)
         linha = resultados_condiçao[0]
         coluna = resultados_condiçao[1]
@@ -474,25 +474,45 @@ def usarEstrategia(tabuleiro,nr_da_jogada,estrategia,estrategia_posiçoes,linha,
     return [linha,coluna,estrategia_posiçoes]
 
 
-#Função que vai ocupar um espaço aleatoriamente, uma vez que o espaço do meio já foi ocupado e não há hipóteses de ganhar.
+#Função que vai ocupar um espaço aleatoriamente, uma vez que o espaço do meio já foi ocupado e não há grandes hipóteses de ganhar.
 def posicionarAleatoriamente(tabuleiro):
-    for numero_random in range(3):
-        if tabuleiro[numero_random].count(' ') > 0:
-            for i in range(3):
-                if tabuleiro[numero_random][i] == ' ':
-                    tabuleiro[numero_random][i] == 'O'
-                    return [numero_random, i]
+    linhas = [0,1,2]  #Armazenar os indexes das linhas
+    linhas_aleatorias = []
+    index_maximo = 2
+    #Ordenar aleatoriamente os indexes das linhas
+    for i in range(3): 
+        index = randint(0,index_maximo)       
+        linhas_aleatorias.append(linhas[index])
+        del linhas[index]
+        index_maximo -= 1
+    index_maximo = 2
+    colunas = [0,1,2]  #Armazenar os indexes das colunas
+    colunas_aleatorias = []
+    for i in range(3):   # 0
+        #Ordenar aleatoriamente os indexes das colunas
+        for j in range(3): 
+            index = randint(0,index_maximo)       
+            colunas_aleatorias.append(colunas[index])
+            del colunas[index]
+            index_maximo -= 1
+        for ii in range(3):
+            if tabuleiro[linhas_aleatorias[i]][colunas_aleatorias[ii]] == ' ':
+                return [linhas_aleatorias[i], colunas_aleatorias[ii]]
+        #Dar reset aos valores para quando for iterar a próxim linha, conseguir iterar as colunas nova e aleatoriamente
+        colunas =[0,1,2]
+        colunas_aleatorias = []
+        index_maximo = 2
 
 
 #Função que verifica se o jogo já pode terminar
 def analisarTabuleiro(tabuleiro): 
-    #Não usei estruturas de repetição for/while para descobrir quem foi o vencedor ou se foi empate, porque a lista tem apenas três (poucas) listas
+    #Não uso estruturas de repetição for/while para descobrir quem foi o vencedor ou se foi empate, porque a lista tem apenas três (poucas) listas
     #Se uma das filas forem ocupadas por três símbolos iguais: 
     if tabuleiro[0] == ['X','X','X'] or tabuleiro[1] == ['X','X','X'] or tabuleiro[2] == ['X','X','X']:
         return 2 
     elif tabuleiro[0] == ['O','O','O'] or tabuleiro[1] == ['O','O','O'] or tabuleiro[2] == ['O','O','O']:
         return 2
-    #Se três símbolos iguais ocuparem uma das duas diagonais: 
+    #Se os três símbolos que ocuparem uma das duas diagonais forem iguais: 
     if ((tabuleiro[0][0] == 'X' and tabuleiro[1][1] == 'X' and tabuleiro[2][2] == 'X') or 
     (tabuleiro[2][0] == 'X' and tabuleiro[1][1] == 'X' and tabuleiro[0][2] == 'X')):
         return 2
@@ -508,7 +528,7 @@ def analisarTabuleiro(tabuleiro):
     (tabuleiro[0][1] == 'O' and tabuleiro[1][1] == 'O' and tabuleiro[2][1] == 'O') or
     (tabuleiro[0][2] == 'O' and tabuleiro[1][2] == 'O' and tabuleiro[2][2] == 'O')):
         return 2
-    #se as condições anteriores eram falsas e todos os espaços vazios do tabuleiro foram ocupados, significa que é empate
+    #se as condições anteriores são falsas e todos os espaços vazios do tabuleiro foram ocupados, significa que é empate
     if tabuleiro[0].count(' ') + tabuleiro[1].count(' ') + tabuleiro[2].count(' ') == 0:
         return 3
     #caso contrário, o jogo continuará.
@@ -544,7 +564,7 @@ def terminarOJogo(fim_do_jogo, texto):
             
 
 #Função que inicializa um jogo contra um amigo
-def jogarContraAmigo(player1,player2,jogar_novamente):
+def jogarContraAmigo(player1,player2):
     resultados = []
     tabuleiro = [[' ',' ',' '],[' ',' ',' '],[' ',' ',' ']]
     tente_novamente = False
@@ -619,7 +639,7 @@ def jogarContraComputador(estrategia,quem_joga):
         nr_da_jogada += 1
 
 
-#Função que abre um menu com as opções referidas no input da linha 660.
+#Função que abre um menu com as opções referidas no input da opçao1.
 def menuJogarPrimeiro():
         opçao1 = input('\n\n\n\t\t\tQUEM COMEÇA PRIMEIRO?\n\t\t\t1-Eu\n\t\t\t2-Computador\n\t\t\t3-Aleatorio\n\t\t\t0-Retroceder\n\t\t\tEscolha uma opção: ')
         estrategia = randint(1,2) #O computador vai escolher aleatoriamente uma das estratégias.
